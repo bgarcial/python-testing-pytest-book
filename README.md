@@ -1,0 +1,2 @@
+
+This repository is created to get track of things while reading the awesome book **[Python Testing with pytest](https://pythontest.com/pytest-book/)** created by [Brian Okken](https://twitter.com/brianokken)
