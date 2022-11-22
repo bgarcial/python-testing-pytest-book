@@ -56,4 +56,4 @@ Here's a demo of how it works:
       list     List cards in db.
       start    Set a card state to 'in prog'.
       update   Modify a card in db with given id with new info.
-      version  Return version of cards application
+      version  Return version of cards application.
