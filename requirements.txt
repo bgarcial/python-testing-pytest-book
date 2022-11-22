@@ -1,1 +1,2 @@
 pytest
+# pip install ./cards_proj
