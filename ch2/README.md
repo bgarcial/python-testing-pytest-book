@@ -107,3 +107,88 @@ not allow the code to be run if it is imported. When a module is imported,
 Python will fill in `__name__` with the name of the module, which is the name of
 the file without the `.py`. However, if you run the file with `python file.py`, `__name__`
 will be filled in by Python with the string `"__main__"`.
+
+---
+# Writing Assertion Helper Functions
+
+An assertion helper is a function that is used to wrap up a complicated
+assertion check. As an example, the Cards data class is set up **such that two
+cards with different IDs will still report equality.** If we wanted to have a stricter
+check, we could write a helper function called assert_identical like this: see `test_helper.py` file
+
+---
+
+# Testing for Expected Exceptions
+
+We’ve looked at how any exception can cause a test to fail. But what if a bit
+of code you are testing is supposed to raise an exception? How do you test
+for that?
+You use `pytest.raises()` to test for expected exceptions.
+
+As an example, the cards API has a CardsDB class that requires a path argument.
+What happens if we don’t pass in a path? Let’s try it:
+
+```
+import cards
+
+def test_no_path_fail():
+    cards.CardsDB()
+```
+
+Then test it 
+```
+> pytest --tb=short ch2/test_experiment.py::test_no_path_fail
+============================================================== test session starts ===============================================================
+platform linux -- Python 3.10.8, pytest-7.2.0, pluggy-1.0.0
+rootdir: /home/bgarcial/projects/python-testing-pytest-book
+collected 1 item                                                                                                                                 
+
+ch2/test_experiment.py F                                                                                                                   [100%]
+
+==================================================================== FAILURES ====================================================================
+_______________________________________________________________ test_no_path_fail ________________________________________________________________
+ch2/test_experiment.py:4: in test_no_path_fail
+    cards.CardsDB()
+E   TypeError: CardsDB.__init__() missing 1 required positional argument: 'db_path'
+============================================================ short test summary info =============================================================
+FAILED ch2/test_experiment.py::test_no_path_fail - TypeError: CardsDB.__init__() missing 1 required positional argument: 'db_path'
+=============================================================== 1 failed in 0.05s ================================================================
+```
+
+Here the `--tb=short` shorter traceback format is used because we don’t need to
+see the full traceback to find out which exception is raised.
+
+The `TypeError` exception seems reasonable, since the error occurs when trying
+to initialize the custom CardsDB type. See `/home/bgarcial/.pyenv/versions/3.10.8/envs/pytest-book/lib/python3.10/site-packages/cards/api.py` internal file:
+
+![](https://cldup.com/zr0vBRlHp6.png)
+
+When trying to initialize the custom `CardsDB` type,it needs a `db_path argument that is missing and that is why the
+`TypeError` exception raised. We can write a test to make sure this exception is thrown, like this:
+
+```
+import pytest
+import cards
+
+
+def test_no_path_raises():
+    with pytest.raises(TypeError):
+        cards.CardsDB()
+```
+
+The `with pytest.raises(TypeError):` statement says that whatever is in the next block
+of code should raise a `TypeError` exception. If no exception is raised, the test
+fails. If the test raises a different exception, it fails.
+
+```
+> pytest --tb=short ch2/test_exceptions.py::test_no_path_raises
+============================================================== test session starts ===============================================================
+platform linux -- Python 3.10.8, pytest-7.2.0, pluggy-1.0.0
+rootdir: /home/bgarcial/projects/python-testing-pytest-book
+collected 1 item                                                                                                                                 
+
+ch2/test_exceptions.py .                                                                                                                   [100%]
+
+=============================================================== 1 passed in 0.02s ================================================================
+
+```
